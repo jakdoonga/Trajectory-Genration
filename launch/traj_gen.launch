@@ -1,0 +1,6 @@
+<launch>
+    <node pkg="traj_gen" type="traj_gen_node" name="traj_gen_node" output="screen"/>
+
+        <param name="yaml_config" value="$(find traj_gen)/config/traj_setup.yaml"/>
+
+</launch>
