@@ -41,7 +41,8 @@ include_directories(
   ${CATKIN_DEVEL_PREFIX}/${CATKIN_GLOBAL_INCLUDE_DESTINATION}
 )
 
-add_executable(traj_gen_node  include/traj_gen/traj_gen.cpp
+add_executable(traj_gen_node  include/traj_gen/convert_traj_to_target.cpp
+                              include/traj_gen/traj_gen.cpp
                               include/traj_gen/double_integral_planner.cpp
                               include/traj_gen/yaml_read.cpp
                               src/traj_generator_node.cpp)

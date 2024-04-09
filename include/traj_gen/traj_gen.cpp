@@ -1,8 +1,37 @@
 #include "traj_gen.hpp"
+#include "convert_traj_to_target.hpp"
 
 Traj_Generator::Traj_Generator()
 {
     cout<<"Constructor is called.\n";
+
+    // Get Yaml directory from launch file.
+    nh_.getParam("yaml_config", yaml_dir);
+
+    for(int i = 0; i < 3; i++)
+        init_pos[i] = 0;
+
+
+    nh_.getParam("init_pos3",init_pos[3]);
+    nh_.getParam("init_pos4",init_pos[4]);
+    nh_.getParam("init_pos5",init_pos[5]);
+    
+    nh_.getParam("init_inc0",init_inc[0]);
+    nh_.getParam("init_inc1",init_inc[1]);
+    nh_.getParam("init_inc2",init_inc[2]);
+    nh_.getParam("init_inc3",init_inc[3]);
+    nh_.getParam("init_inc4",init_inc[4]);
+    nh_.getParam("init_inc5",init_inc[5]);
+
+    for(int i = 0; i < 6; i++)
+    {
+        cout<<"Init pos["<<i<<"]: "<<init_pos[i]<<endl;
+    }
+
+    for(int i = 0; i < 6; i++)
+    {
+        cout<<"Init inc["<<i<<"]: "<<init_inc[i]<<endl;
+    }
 
     for(int i = 0; i < 3; i++)
     {
@@ -17,13 +46,10 @@ Traj_Generator::Traj_Generator()
         traj_data.v_curr[i] = 0;
         traj_data.p_curr[i] = 0;
         des_pos[i] = 0;
-        init_pos[i] = 0;
     }
 
     mode_value = 255;
 
-    // Get Yaml directory from launch file.
-    nh_.getParam("yaml_config", yaml_dir);
 
     // Allocate dynamic memory for yaml_read
     // and call the corresponding constructor.
@@ -39,8 +65,6 @@ Traj_Generator::Traj_Generator()
     nh_motors_publisher = nh_.advertise<target>("/target", 10);
 
     nh_dxl_publisher = nh_.advertise<target_dxl>("/target_dxl",10);
-
-
 
 }
 
@@ -148,6 +172,7 @@ void Traj_Generator::move_motors()
         cout<<"****************"<<endl;
         cout<<"Time: "<<t_traj<<endl;
         move_LIFT_motors();
+        publish_target();
     }
     else if(mode_value == 3)
     {
@@ -159,7 +184,19 @@ void Traj_Generator::move_motors()
         cout<<"****************"<<endl;
         cout<<"Time: "<<t_traj<<endl;
         move_PAN_motors();
+        publish_target();
     }
+}
+
+void Traj_Generator::publish_target()
+{
+    target_msg.stamp = ros::Time::now();
+    for(int i = 0; i < 3; i++)
+    {
+        target_msg.target_PAN[i] = convert_deg2target_PAN(des_pos[i]) + init_inc[i];
+        target_msg.target_LIFT[i] = convert_deg2target_LIFT(des_pos[i+3]) + init_inc[i+3];
+    }
+    nh_motors_publisher.publish(target_msg);
 }
 
 void Traj_Generator::move_PAN_motors()
@@ -168,6 +205,9 @@ void Traj_Generator::move_PAN_motors()
         getTraj(traj_data, i, t_traj);
     
     init_des_traj(0);
+
+    for(int i = 0; i < 3; i++)
+        des_pos[i+3] = init_pos[i+3];
 
     for(int i = 0 ; i < 6; i++)
         cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;
@@ -179,6 +219,9 @@ void Traj_Generator::move_LIFT_motors()
         getTraj(traj_data, i+3, t_traj);
 
     init_des_traj(3);
+
+    for(int i = 0; i < 3; i++)
+        des_pos[i] = init_pos[i];
 
     for(int i = 0 ; i < 6; i++)
         cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;

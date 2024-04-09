@@ -88,9 +88,11 @@ class Traj_Generator{
         // Move Pan motors
         void move_PAN_motors();
 
+        // Publish target msg (PAN, LIFT, WHEEL)
+        void publish_target();
+
         // To generate global desired trajectory,
-        // check final time and then initialize
-        // trajectory data.
+        // check final time and then initialize des_pos.
         void init_des_traj(int offset);
 
         /**
@@ -146,12 +148,14 @@ class Traj_Generator{
 
         TRJ_DATA traj_data;
 
-        double des_pos[NUM_LIFT + NUM_PAN];
+        double des_pos[NUM_PAN + NUM_LIFT];
 
         double des_pos_STEERING[NUM_DXL];
         double des_vel_WHEEL[NUM_WHEEL];
 
-        double init_pos[NUM_LIFT+NUM_PAN];
+        double init_pos[NUM_PAN + NUM_LIFT];
+
+        int32_t init_inc[NUM_PAN + NUM_LIFT];
 
         // Goal position
         double goal_pos[3];
