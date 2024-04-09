@@ -167,18 +167,7 @@ void Traj_Generator::move_PAN_motors()
     for(int i = 0; i < 3; i++)
         getTraj(traj_data, i, t_traj);
     
-    // init_des_traj();
-    for(int i = 0; i < 3; i++)
-    {
-        if(t_traj > dip_ptr[i]->getFinalTime() + 1)
-        {
-            init_pos[i] = des_pos[i];
-        }
-        else
-        {
-            des_pos[i] = traj_data.p_curr[i] + init_pos[i];
-        }
-    }
+    init_des_traj(0);
 
     for(int i = 0 ; i < 6; i++)
         cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;
@@ -189,36 +178,24 @@ void Traj_Generator::move_LIFT_motors()
     for(int i = 0; i < 3; i++)
         getTraj(traj_data, i+3, t_traj);
 
-    // init_des_traj();
-    for(int i = 0; i < 3; i++)
-    {
-        if(t_traj > dip_ptr[i+3]->getFinalTime() + 1)
-        {
-            init_pos[i+3] = des_pos[i+3];
-        }
-        else
-        {
-            des_pos[i+3] = traj_data.p_curr[i+3] + init_pos[i+3];
-        }
-    }
-    
+    init_des_traj(3);
+
     for(int i = 0 ; i < 6; i++)
         cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;
 }
 
-void Traj_Generator::init_des_traj()
+void Traj_Generator::init_des_traj(int offset)
 {
-    for(int i = 0; i < 6; i++)
+    for(int i = 0; i < 3; i++)
     {
-        if(t_traj > dip_ptr[i]->getFinalTime() + 1)
+        if(t_traj > dip_ptr[i+offset]->getFinalTime() + 1)
         {
-            init_pos[i] = des_pos[i];
+            init_pos[i+offset] = des_pos[i+offset];
         }
         else
         {
-            des_pos[i] = traj_data.p_curr[i] + init_pos[i];
+            des_pos[i+offset] = traj_data.p_curr[i+offset] + init_pos[i+offset];
         }
-        cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;
     }
 }
 

@@ -88,7 +88,10 @@ class Traj_Generator{
         // Move Pan motors
         void move_PAN_motors();
 
-        void init_des_traj();
+        // To generate global desired trajectory,
+        // check final time and then initialize
+        // trajectory data.
+        void init_des_traj(int offset);
 
         /**
          * DIP setup and get trajectory for idx
