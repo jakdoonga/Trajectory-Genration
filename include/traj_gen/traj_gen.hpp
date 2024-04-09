@@ -39,9 +39,6 @@ class Traj_Generator{
 
         Traj_Generator();
 
-        // Get yaml directory
-        void get_yaml_dir();
-
         // Trajectory constraint setup
         void constraint_setup();
 
@@ -59,8 +56,8 @@ class Traj_Generator{
         void callbackTwist(const Twist::ConstPtr& twist_ref);
 
         /**
-         * Movement member functions according
-         * to mode value
+         * Set goal position member functions 
+         * according to mode value
         */
 
 
@@ -90,6 +87,8 @@ class Traj_Generator{
 
         // Move Pan motors
         void move_PAN_motors();
+
+        void init_des_traj();
 
         /**
          * DIP setup and get trajectory for idx
@@ -137,18 +136,19 @@ class Traj_Generator{
 
 
         /**
-         * Desired position of LIFT, PAN, and STEERING
+         * Trajectory data(position, velocity, acceleration) 
+         * - LIFT, PAN
          * Desired velocity of WHEEL
         */
 
-        double des_pos_LIFT[NUM_LIFT];
-        double des_vel_LIFT[NUM_LIFT];
+        TRJ_DATA traj_data;
 
-        double des_pos_PAN[NUM_PAN];
-        double des_vel_PAN[NUM_PAN];
+        double des_pos[NUM_LIFT + NUM_PAN];
 
         double des_pos_STEERING[NUM_DXL];
         double des_vel_WHEEL[NUM_WHEEL];
+
+        double init_pos[NUM_LIFT+NUM_PAN];
 
         // Goal position
         double goal_pos[3];
@@ -167,11 +167,15 @@ class Traj_Generator{
         int32_t target_LIFT[NUM_LIFT];
         int32_t target_PAN[NUM_PAN];
         int32_t target_WHEEL[NUM_WHEEL];
-        int32_t target_dxl[NUM_DXL];
+        int32_t target_dxl_[NUM_DXL];
 
         uint8_t mode_value;
 
-        TRJ_DATA traj_data;
+        target_dxl target_dxl_msg;
+        target target_msg;
+
+
+
 
 };
 

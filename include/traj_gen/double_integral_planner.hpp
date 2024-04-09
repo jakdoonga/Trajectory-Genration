@@ -21,11 +21,13 @@ class DoubleIntegralPlanner
         void setGoalPos(double &p_goal_ref);
         void setAcc_max(double &a_max_ref);
         void setVel_max(double &v_max_ref);
-
+        void setInitialPos(double &pos_init);
 
         double getPos();
         double getVel();
         double getAcc();
+
+        double getFinalTime();
 
     private:
         double a_max;

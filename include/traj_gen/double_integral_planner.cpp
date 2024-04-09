@@ -35,7 +35,22 @@ void DoubleIntegralPlanner::setVel_max(double &v_max_ref)
     cout << "vel max: "<<v_max<<endl;
 }
 
+void DoubleIntegralPlanner::setInitialPos(double &pos_init)
+{
+    p_curr = pos_init;
+}
+
 void DoubleIntegralPlanner::TimeCalc() {
+
+    if(p_goal < 0)
+    {
+        a_max = a_max > 0 ? -a_max:a_max;
+        v_max = v_max > 0 ? -v_max:v_max;
+    }else
+    {
+        a_max = fabs(a_max);
+        v_max = fabs(v_max);
+    }
     
     t_1 = v_max/a_max;
     t_2 = (p_goal/v_max);
@@ -54,32 +69,35 @@ void DoubleIntegralPlanner::TimeCalc() {
 }
 
 void DoubleIntegralPlanner::goalTraj(double t) {
-    if ( t < 0)
+    if(t < 0)
     {
-        p_curr = 0;
-        v_curr = 0;
         a_curr = 0;
-        // cout<<"Negative time"<<endl;
+        v_curr = 0;
+        p_curr = 0;
     }
     else if (t >= 0 && t <= t_1) {
         a_curr = a_max;
         v_curr = a_curr*t;
         p_curr = 0.5*v_curr*t;
+        // cout<<"ACC"<<endl;
     }
-    else if (t <= t_2) {
+    else if (t > t_1 && t <= t_2) {
         a_curr = 0;
         v_curr = a_max*t_1;
         p_curr = 0.5*v_max*t_1 + v_curr*(t-t_1);
+        // cout<<"CRUISE"<<endl;
     }
-    else if (t <= t_f) {
+    else if (t > t_2 && t <= t_f) {
         a_curr = -a_max;
         v_curr = a_max*t_1 + a_curr*(t-t_2);
         p_curr = 0.5*v_max*t_1 + v_max*(t_2-t_1) + 0.5*(v_max+v_curr)*(t-t_2);
+        // cout<<"DEC"<<endl;
     }
     else if (t >= t_f){
         a_curr = 0;
         v_curr = 0;
         p_curr = 0.5*v_max*t_1 + v_max*(t_2-t_1) + 0.5*v_max*(t_f-t_2);
+        // cout<<"REACHED"<<endl;
     }
 }
 
@@ -96,4 +114,9 @@ double DoubleIntegralPlanner::getVel()
 double DoubleIntegralPlanner::getAcc()
 {
     return a_curr;
+}
+
+double DoubleIntegralPlanner::getFinalTime()
+{
+    return t_f;
 }
