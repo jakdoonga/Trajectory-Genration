@@ -4,6 +4,8 @@
 #include "traj_gen_definition.hpp"
 #include "double_integral_planner.hpp"
 #include "yaml_read.hpp"
+#include "wheel_vel_gen.hpp"
+#include "convert_tools.hpp"
 
 #include <ros/ros.h>
 
@@ -113,9 +115,10 @@ class Traj_Generator{
         ros::NodeHandle nh_;
 
 
-        // Declare dip_ptr and yaml_read_ptr
+        // Declare dip_ptr, yaml_read_ptr and wheel_vel_gen_ptr
         DoubleIntegralPlanner *dip_ptr[6];
         YAML_READ *yaml_read_ptr;
+        WHEEL_VEL_GEN *wheel_vel_gen_ptr;
 
         // Yaml directory and trajectory constraint
         // traj_constraint[0].name : PAN
@@ -151,10 +154,11 @@ class Traj_Generator{
         double des_pos[NUM_PAN + NUM_LIFT];
 
         double des_pos_STEERING[NUM_DXL];
-        double des_vel_WHEEL[NUM_WHEEL];
+        double des_linear_vel_WHEEL[NUM_WHEEL];
+        double des_angular_vel_WHEEL[NUM_WHEEL];
 
+        // Initial position and increment info for PAN and LIFT
         double init_pos[NUM_PAN + NUM_LIFT];
-
         int32_t init_inc[NUM_PAN + NUM_LIFT];
 
         // Goal position
@@ -175,6 +179,16 @@ class Traj_Generator{
         int32_t target_PAN[NUM_PAN];
         int32_t target_WHEEL[NUM_WHEEL];
         int32_t target_dxl_[NUM_DXL];
+
+
+        /**
+         * Actual position array from sensor
+         * actual_pos_LIFT: position        (INC)
+        */
+        int32_t actual_pos_LIFT[NUM_LIFT];
+
+        // position of LIFT reflecting on reduction ratio (deg)
+        double pos_LIFT[NUM_LIFT];
 
         uint8_t mode_value;
 

@@ -1,5 +1,5 @@
 #include "traj_gen.hpp"
-#include "convert_traj_to_target.hpp"
+
 
 Traj_Generator::Traj_Generator()
 {
@@ -12,6 +12,9 @@ Traj_Generator::Traj_Generator()
         init_pos[i] = 0;
 
 
+    /**
+     * Parameter setup
+    */
     nh_.getParam("init_pos3",init_pos[3]);
     nh_.getParam("init_pos4",init_pos[4]);
     nh_.getParam("init_pos5",init_pos[5]);
@@ -19,6 +22,7 @@ Traj_Generator::Traj_Generator()
     nh_.getParam("init_inc0",init_inc[0]);
     nh_.getParam("init_inc1",init_inc[1]);
     nh_.getParam("init_inc2",init_inc[2]);
+
     nh_.getParam("init_inc3",init_inc[3]);
     nh_.getParam("init_inc4",init_inc[4]);
     nh_.getParam("init_inc5",init_inc[5]);
@@ -36,7 +40,8 @@ Traj_Generator::Traj_Generator()
     for(int i = 0; i < 3; i++)
     {
         des_pos_STEERING[i] = 0;
-        des_vel_WHEEL[i] = 0;
+        des_linear_vel_WHEEL[i] = 0;
+        des_angular_vel_WHEEL[i] = 0;
         goal_pos[i] = 0;
     }
 
@@ -57,9 +62,16 @@ Traj_Generator::Traj_Generator()
 
     constraint_setup();
 
+    wheel_vel_gen_ptr = new WHEEL_VEL_GEN();
+
     nh_mode_subscriber = nh_.subscribe("/mode_val",
                                         10,
                                         &Traj_Generator::callbackModeVal,
+                                        this);
+
+    nh_actual_subscriber = nh_.subscribe("/actual",
+                                        10,
+                                        &Traj_Generator::callbackActual,
                                         this);
     
     nh_motors_publisher = nh_.advertise<target>("/target", 10);
@@ -118,6 +130,13 @@ void Traj_Generator::callbackModeVal(const mode::ConstPtr& mode_ref)
 
 void Traj_Generator::callbackActual(const actual::ConstPtr& actual_ref)
 {
+    for(int i = 0; i < 3; i++)
+    {
+        actual_pos_LIFT[i] = actual_ref->act_LIFT_pos[i];
+        pos_LIFT[i] = convert_actual2pos_LIFT(
+            actual_pos_LIFT[i]+init_inc[i+3]);
+    }
+
 
 }
 
@@ -172,6 +191,14 @@ void Traj_Generator::move_motors()
         cout<<"****************"<<endl;
         cout<<"Time: "<<t_traj<<endl;
         move_LIFT_motors();
+        
+        wheel_vel_gen_ptr->get_wheel_vel(
+            des_linear_vel_WHEEL,
+            des_angular_vel_WHEEL, 
+            pos_LIFT, 
+            traj_data.v_curr, 
+            LIFT_WHEEL);
+        
         publish_target();
     }
     else if(mode_value == 3)
@@ -184,6 +211,14 @@ void Traj_Generator::move_motors()
         cout<<"****************"<<endl;
         cout<<"Time: "<<t_traj<<endl;
         move_PAN_motors();
+
+        wheel_vel_gen_ptr->get_wheel_vel(
+        des_linear_vel_WHEEL,
+        des_angular_vel_WHEEL, 
+        pos_LIFT, 
+        traj_data.v_curr, 
+        PAN_WHEEL);
+        
         publish_target();
     }
 }
@@ -195,7 +230,10 @@ void Traj_Generator::publish_target()
     {
         target_msg.target_PAN[i] = convert_deg2target_PAN(des_pos[i]) + init_inc[i];
         target_msg.target_LIFT[i] = convert_deg2target_LIFT(des_pos[i+3]) + init_inc[i+3];
+        target_msg.target_WHEEL[i] = (int32_t) (des_angular_vel_WHEEL[i]*degps2RPM);
+        cout<<"wheel vel: "<<des_angular_vel_WHEEL[i]<<"\t";
     }
+    cout<<"\n";
     nh_motors_publisher.publish(target_msg);
 }
 
@@ -209,8 +247,8 @@ void Traj_Generator::move_PAN_motors()
     for(int i = 0; i < 3; i++)
         des_pos[i+3] = init_pos[i+3];
 
-    for(int i = 0 ; i < 6; i++)
-        cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;
+    // for(int i = 0 ; i < 6; i++)
+        // cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;
 }
 
 void Traj_Generator::move_LIFT_motors()
@@ -223,8 +261,8 @@ void Traj_Generator::move_LIFT_motors()
     for(int i = 0; i < 3; i++)
         des_pos[i] = init_pos[i];
 
-    for(int i = 0 ; i < 6; i++)
-        cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;
+    // for(int i = 0 ; i < 6; i++)
+        // cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;
 }
 
 void Traj_Generator::init_des_traj(int offset)
@@ -264,6 +302,8 @@ Traj_Generator::~Traj_Generator()
 
     // Delete the allocated dynamic memory for yaml_read
     delete yaml_read_ptr;
+
+    delete wheel_vel_gen_ptr;
 
     cout<<"Destructor is called."<<endl;
 }
