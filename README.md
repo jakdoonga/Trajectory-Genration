@@ -52,7 +52,9 @@ Run pan and wheel motors at the same time.
 
 Execute the node by using roslaunch.
 
-```roslaunch traj_gen traj_gen.launch ```
+```
+roslaunch traj_gen traj_gen.launch 
+```
 
 Run lift and wheel synchronously.
 
