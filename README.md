@@ -1,4 +1,4 @@
-# Trajectory-Genration
+# Trajectory-Genrator
 
 ## 1. Trajectory constraint setup
 Navigate to traj_gen/config/traj_setup.yaml.
@@ -17,13 +17,13 @@ the offset position value of the lift motors.
 Steer before lift and wheel motor moves.
 
 ### mode_val: 2
-Run lift and wheel motors simultaneously.
+Generate and publish the trajectory that lift and wheel motors move simultaneously.
 
 ### mode_val: 3
 Steer before pan and wheel motor moves.
 
 ### mode_val: 4
-Run pan and wheel motors at the same time.
+Create and publish the trajectory which run pan and wheel motors at the same time.
 
 ### mode_val: 5
 Steer before moving forward.
@@ -56,7 +56,8 @@ Execute the node by using roslaunch.
 roslaunch traj_gen traj_gen.launch 
 ```
 
-Move lift and wheel synchronously.
+Create the trajectory of lift and wheel.
+Herein, the goal position is not the relative value but the absolute one.
 
 ```
 rostopic pub /mode_val traj_gen/mode "mode_val: 2 
@@ -65,3 +66,11 @@ goal_pos:
 - 22.0
 - 20.0"
 ```
+
+## 6. Lift motor trajectory test result
+
+Bug fixed.
+
+Target increment value of lift motor starts from 0 when the offset value of lift motor is set. 
+
+<image src="figures/lift_motor_test.png">
