@@ -2,16 +2,10 @@
     <node pkg="traj_gen" type="traj_gen_node" name="traj_gen_node" output="screen"/>
         <param name="yaml_config" value="$(find traj_gen)/config/traj_setup.yaml"/>
         
-        <param name="init_pos3" type="double" value="10"/>
-        <param name="init_pos4" type="double" value="20"/>
-        <param name="init_pos5" type="double" value="30"/>
+        <param name="offset_pos1" type="double" value="30"/>
+        <param name="offset_pos2" type="double" value="30"/>
+        <param name="offset_pos3" type="double" value="30"/>
         
-        <param name="init_inc0" type="int" value="1000"/>
-        <param name="init_inc1" type="int" value="2000"/>
-        <param name="init_inc2" type="int" value="3000"/>
-        <param name="init_inc3" type="int" value="4000"/>
-        <param name="init_inc4" type="int" value="5000"/>
-        <param name="init_inc5" type="int" value="6000"/>
 
 
 </launch>

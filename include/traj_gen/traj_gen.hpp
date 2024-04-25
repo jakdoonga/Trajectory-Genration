@@ -157,9 +157,11 @@ class Traj_Generator{
         double des_linear_vel_WHEEL[NUM_WHEEL];
         double des_angular_vel_WHEEL[NUM_WHEEL];
 
-        // Initial position and increment info for PAN and LIFT
+        // Initialize position and increment info for PAN and LIFT
         double init_pos[NUM_PAN + NUM_LIFT];
-        int32_t init_inc[NUM_PAN + NUM_LIFT];
+
+        // Offet position
+        double offset_pos[NUM_LIFT];
 
         // Goal position
         double goal_pos[3];

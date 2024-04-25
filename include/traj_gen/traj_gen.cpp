@@ -15,26 +15,14 @@ Traj_Generator::Traj_Generator()
     /**
      * Parameter setup
     */
-    nh_.getParam("init_pos3",init_pos[3]);
-    nh_.getParam("init_pos4",init_pos[4]);
-    nh_.getParam("init_pos5",init_pos[5]);
-    
-    nh_.getParam("init_inc0",init_inc[0]);
-    nh_.getParam("init_inc1",init_inc[1]);
-    nh_.getParam("init_inc2",init_inc[2]);
+    nh_.getParam("offset_pos1",offset_pos[0]);
+    nh_.getParam("offset_pos2",offset_pos[1]);
+    nh_.getParam("offset_pos3",offset_pos[2]);
 
-    nh_.getParam("init_inc3",init_inc[3]);
-    nh_.getParam("init_inc4",init_inc[4]);
-    nh_.getParam("init_inc5",init_inc[5]);
-
-    for(int i = 0; i < 6; i++)
+    for(int i = 0; i < 3; i++)
     {
-        cout<<"Init pos["<<i<<"]: "<<init_pos[i]<<endl;
-    }
-
-    for(int i = 0; i < 6; i++)
-    {
-        cout<<"Init inc["<<i<<"]: "<<init_inc[i]<<endl;
+        cout<<"Offset pos["<<i<<"]: "<<offset_pos[i]<<endl;
+        init_pos[i+3] = offset_pos[i];
     }
 
     for(int i = 0; i < 3; i++)
@@ -134,7 +122,7 @@ void Traj_Generator::callbackActual(const actual::ConstPtr& actual_ref)
     {
         actual_pos_LIFT[i] = actual_ref->act_LIFT_pos[i];
         pos_LIFT[i] = convert_actual2pos_LIFT(
-            actual_pos_LIFT[i]+init_inc[i+3]);
+            actual_pos_LIFT[i]);
     }
 
 
@@ -228,8 +216,8 @@ void Traj_Generator::publish_target()
     target_msg.stamp = ros::Time::now();
     for(int i = 0; i < 3; i++)
     {
-        target_msg.target_PAN[i] = convert_deg2target_PAN(des_pos[i]) + init_inc[i];
-        target_msg.target_LIFT[i] = convert_deg2target_LIFT(des_pos[i+3]) + init_inc[i+3];
+        target_msg.target_PAN[i] = convert_deg2target_PAN(des_pos[i]);
+        target_msg.target_LIFT[i] = -convert_deg2target_LIFT(des_pos[i+3]-offset_pos[i]);
         target_msg.target_WHEEL[i] = (int32_t) (des_angular_vel_WHEEL[i]*degps2RPM);
         cout<<"wheel vel: "<<des_angular_vel_WHEEL[i]<<"\t";
     }
@@ -247,8 +235,8 @@ void Traj_Generator::move_PAN_motors()
     for(int i = 0; i < 3; i++)
         des_pos[i+3] = init_pos[i+3];
 
-    // for(int i = 0 ; i < 6; i++)
-        // cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;
+    for(int i = 0 ; i < 6; i++)
+        cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;
 }
 
 void Traj_Generator::move_LIFT_motors()
@@ -261,8 +249,8 @@ void Traj_Generator::move_LIFT_motors()
     for(int i = 0; i < 3; i++)
         des_pos[i] = init_pos[i];
 
-    // for(int i = 0 ; i < 6; i++)
-        // cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;
+    for(int i = 0 ; i < 6; i++)
+        cout<<"Motor ["<<i<<"] : "<<des_pos[i]<<endl;
 }
 
 void Traj_Generator::init_des_traj(int offset)
