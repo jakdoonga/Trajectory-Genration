@@ -2,9 +2,9 @@
     <node pkg="traj_gen" type="traj_gen_node" name="traj_gen_node" output="screen"/>
         <param name="yaml_config" value="$(find traj_gen)/config/traj_setup.yaml"/>
         
+        <param name="offset_pos0" type="double" value="30"/>
         <param name="offset_pos1" type="double" value="30"/>
         <param name="offset_pos2" type="double" value="30"/>
-        <param name="offset_pos3" type="double" value="30"/>
         
 
 

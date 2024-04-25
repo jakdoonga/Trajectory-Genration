@@ -15,9 +15,9 @@ Traj_Generator::Traj_Generator()
     /**
      * Parameter setup
     */
-    nh_.getParam("offset_pos1",offset_pos[0]);
-    nh_.getParam("offset_pos2",offset_pos[1]);
-    nh_.getParam("offset_pos3",offset_pos[2]);
+    nh_.getParam("offset_pos0",offset_pos[0]);
+    nh_.getParam("offset_pos1",offset_pos[1]);
+    nh_.getParam("offset_pos2",offset_pos[2]);
 
     for(int i = 0; i < 3; i++)
     {
