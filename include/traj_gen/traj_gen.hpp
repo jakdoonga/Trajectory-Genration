@@ -93,6 +93,9 @@ class Traj_Generator{
         // Publish target msg (PAN, LIFT, WHEEL)
         void publish_target();
 
+        // Publish target msg (DXL)
+        void publish_target_dxl();
+
         // To generate global desired trajectory,
         // check final time and then initialize des_pos.
         void init_des_traj(int offset);
