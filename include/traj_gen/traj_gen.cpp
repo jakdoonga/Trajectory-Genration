@@ -136,8 +136,11 @@ void Traj_Generator::callbackTwist(const Twist::ConstPtr& twist_ref)
 void Traj_Generator::set_DXL_BEFORE_LIFT()
 {
     for(int i = 0; i < 3; i++)
-        target_dxl_[i] = 2048;
-
+    {
+        des_pos_STEERING[i] = 0.0;
+        target_dxl_[i] = (int32_t)(des_pos_STEERING[i] * 4096.0/360.0 + 2048.0);
+        std::cout<<"mode 1"<<std::endl;
+    }
 }
 
 void Traj_Generator::set_LIFT()
@@ -172,6 +175,7 @@ void Traj_Generator::move_motors()
         target_dxl_msg.stamp = ros::Time::now();
         for(int i = 0; i < 3; i++)
             target_dxl_msg.target_dxl[i] = target_dxl_[i];
+        publish_target_dxl();
     }
     else if(mode_value == 2)
     {
@@ -191,7 +195,10 @@ void Traj_Generator::move_motors()
     }
     else if(mode_value == 3)
     {
-
+        target_dxl_msg.stamp = ros::Time::now();
+        for(int i = 0; i < 3; i++)
+            target_dxl_msg.target_dxl[i] = target_dxl_[i];
+        publish_target_dxl();
     }
     else if(mode_value == 4)
     {
@@ -223,6 +230,16 @@ void Traj_Generator::publish_target()
     }
     cout<<"\n";
     nh_motors_publisher.publish(target_msg);
+}
+
+void Traj_Generator::publish_target_dxl()
+{
+    target_dxl_msg.stamp = ros::Time::now();
+    for(int i = 0; i < 3; i++)
+    {
+        target_dxl_msg.target_dxl[i] = convert_deg2target_DXL(des_pos_STEERING[i]);
+    }
+    nh_dxl_publisher.publish(target_dxl_msg);
 }
 
 void Traj_Generator::move_PAN_motors()
