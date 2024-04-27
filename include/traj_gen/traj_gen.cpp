@@ -155,7 +155,7 @@ void Traj_Generator::set_DXL_BEFORE_PAN()
 {
     for(int i = 0; i < 3; i++)
     {
-        des_pos_STEERING[i] = 90.0;
+        des_pos_STEERING[i] = -90.0;
         target_dxl_[i] = (int32_t)(des_pos_STEERING[i] * 4096.0/360.0 + 2048.0);
     }
 }
